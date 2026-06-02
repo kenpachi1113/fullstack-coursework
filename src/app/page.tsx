@@ -38,7 +38,10 @@ export default async function HomePage() {
           <div className="grid grid-4">
             {characters.map((char) => (
               <Link key={char.slug} href={`/characters/${char.slug}`} className="char-card">
-                <div className="char-placeholder" style={{ fontSize: "4rem" }}>⚔️</div>
+                {char.image
+                  ? <img src={char.image} alt={char.name} style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover" }} />
+                  : <div className="char-placeholder" style={{ fontSize: "4rem" }}>⚔️</div>
+                }
                 <div className="char-card-body">
                   <p className="char-card-name">{char.name}</p>
                   <p className="char-card-jp">{char.japaneseName}</p>
@@ -80,7 +83,10 @@ export default async function HomePage() {
           <div className="grid grid-3">
             {latestNews.map((item) => (
               <Link key={item.slug} href={`/news/${item.slug}`} className="news-card">
-                <div className="news-placeholder">📰</div>
+                {item.image
+                  ? <img src={item.image} alt={item.title} style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover" }} />
+                  : <div className="news-placeholder">📰</div>
+                }
                 <div className="news-card-body">
                   <p className="news-card-date">
                     {new Date(item.publishedAt).toLocaleDateString("uk-UA", { year: "numeric", month: "long", day: "numeric" })}
