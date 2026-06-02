@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { put } from "@vercel/blob";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
@@ -13,15 +14,17 @@ export async function POST(req: NextRequest) {
   if (!ALLOWED_TYPES.includes(file.type)) return NextResponse.json({ error: "Дозволені лише JPG, PNG, WebP, GIF" }, { status: 400 });
   if (file.size > MAX_SIZE) return NextResponse.json({ error: "Максимальний розмір файлу — 5MB" }, { status: 400 });
 
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const blob = await put(file.name, file, { access: "public" });
+    return NextResponse.json({ url: blob.url });
+  }
+
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
-
   const uploadsDir = path.join(process.cwd(), "public", "uploads");
   await mkdir(uploadsDir, { recursive: true });
-
   const ext = path.extname(file.name).toLowerCase() || ".jpg";
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
   await writeFile(path.join(uploadsDir, filename), buffer);
-
   return NextResponse.json({ url: `/uploads/${filename}` });
 }
